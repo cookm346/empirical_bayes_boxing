@@ -1,0 +1,70 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Scrape boxrec.com boxer ratings
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(RSelenium)
+```
+
+```{r}
+# box rec has a query string "offset" that determines pagination
+# at the time of writing there are 364 pages
+offsets <- seq(0, 18150, 50)
+
+rD <- rsDriver(browser = "firefox", 
+               port = 5678L,
+               extraCapabilities = list(acceptInsecureCerts = TRUE, 
+                                        acceptUntrustedCerts = TRUE))
+remDr <- rD[["client"]]
+
+# function to scrape boxrec.com page with selenium
+scrape_page <- function(driver, offset){
+    url <- paste0("https://boxrec.com/en/ratings?offset=", offset)
+
+    remDr$navigate(url) 
+    
+    Sys.sleep(runif(1, 1, 2))
+    
+    page_source <- remDr$getPageSource()
+    page_source <- page_source[[1]]
+    
+    tbl <- page_source %>%
+        read_html() %>%
+        html_table()
+    
+    return(tbl[[2]])
+}
+
+# scrape all boxer ratings
+boxing_ratings <- map_df(offsets, scrape_page, driver = remDr)
+
+```
+
+```{r}
+#tidy data and save as csv
+boxing_ratings_cleaned <- boxing_ratings %>%
+    rename(rank = "...1",
+           w_l_d = "w-l-d") %>%
+    select(rank, name, points, division, age, w_l_d, stance, residence) %>% 
+    filter( ! is.na(rank)) %>%
+    filter( ! str_starts(rank, "freestar")) %>%
+    filter( ! str_starts(rank, "google")) %>% 
+    separate(w_l_d, c("wins", "loses", "draws")) %>%
+    mutate(wins = parse_number(wins),
+           loses = parse_number(loses),
+           draws = parse_number(draws)) %>%
+    mutate(n = wins + loses + draws,
+           win_rate = wins / n)
+
+write_csv(boxing_ratings_cleaned, "data/boxing_ratings.csv")
+```
