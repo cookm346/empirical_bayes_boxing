@@ -92,7 +92,7 @@ is large enough. The most drastic differences between the raw win rate
 and the empirical Bayesian approach is for those boxers who have very
 low win rates.
 
-<br / >
+<br />
 
     library(glue)
 
@@ -137,7 +137,7 @@ win rate estimate.
 
 ![](empirical_bayes_boxing_files/figure-markdown_strict/unnamed-chunk-7-1.png)
 
-<br / >
+<br />
 
 ### Which boxers have estimated win rates gerater than 90%?
 

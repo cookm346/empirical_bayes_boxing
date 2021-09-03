@@ -92,7 +92,7 @@ boxing_augment %>%
 
 The plot above shows how each boxer's win rate plotted against the empirical Bayes estimate. The size of each point represents how many boxing matches the boxer has had. The Bayesian estimate for boxer's with very low or very high win rates are shifted towards the average win rate (the dotted red line), unless the number of boxing matches they have had is large enough. The most drastic differences between the raw win rate and the empirical Bayesian approach is for those boxers who have very low win rates.
 
-<br / >
+<br />
 
 ```{r}
 library(glue)
@@ -132,7 +132,7 @@ boxing_augment %>%
 
 ```
 
-<br / >
+<br />
 
 ### Which boxers have estimated win rates gerater than 90%?
 
